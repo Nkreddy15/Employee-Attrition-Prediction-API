@@ -1,0 +1,101 @@
+Employee ID,Age,Gender,Education Level,Department,Job Role,Salary (USD),Income (Euro),Years of Experience,Performance Rating,Working Hours,Distance from Home,Commute Method,Marital Status,Attrition (Target)
+200001,25,Male,Bachelor's,IT,Software Engineer,50000,350000,3,3,8,10,Car,Single,No
+200002,34,Female,Master's,Marketing,Marketing Manager,75000,525000,10,4,9,20,Public Transit,Married,No
+200003,42,Male,PhD,Research,Research Scientist,100000,700000,20,5,7,15,Walk,Married,No
+200004,29,Female,Diploma,Sales,Sales Representative,45000,315000,2,2,10,5,Car,Single,Yes
+200005,36,Male,Bachelor's,IT,Software Engineer,80000,560000,12,4,8,30,Public Transit,Married,No
+200006,28,Female,Master's,Finance,Financial Analyst,60000,420000,4,3,9,10,Car,Single,Yes
+200007,33,Male,Diploma,Sales,Sales Representative,55000,385000,7,3,9,10,Car,Married,No
+200008,31,Female,Bachelor's,Marketing,Marketing Analyst,60000,420000,5,3,9,5,Walk,Single,Yes
+200009,37,Male,PhD,Research,Research Manager,120000,840000,18,5,7,20,Public Transit,Married,No
+200010,26,Female,Master's,IT,Software Engineer,55000,385000,3,3,8,15,Car,Single,Yes
+200011,,Male,Bachelor's,IT,Software Engineer,50000,,3,3,8,10,Car,Single,No
+200012,34,Female,Master's,Marketing,,75000,525000,10,4,9,,Public Transit,Married,No
+200013,42,Male,PhD,Research,Research Scientist,100000,700000,20,5,7,15,Walk,Married,No
+200014,29,Female,,Sales,Sales Representative,45000,315000,2,,10,5,Car,Single,No
+200015,36,Male,Bachelor's,IT,Software Engineer,80000,560000,12,4,8,30,,Married,No
+200016,79,Female,Master's,Finance,Financial Analyst,,420000,4,3,9,10,Car,Single,Yes
+200017,33,Male,,Sales,Sales Representative,55000,385000,7,3,9,10,Car,Married,No
+200018,31,Female,Bachelor's,Marketing,Marketing Analyst,60000,420000,5,3,9,5,Walk,Single,Yes
+200019,19,Male,PhD,Research,,120000,840000,15,4,7,20,Public Transit,Married,No
+200020,26,Female,Master's,IT,Software Engineer,55000,385000,3,3,8,15,Car,Single,Yes
+200021,35,Male,Diploma,,Operations Manager,,430000,,3,9,25,Car,Married,No
+200022,27,Female,Bachelor's,Marketing,Marketing Executive,45000,315000,2,8,10,,Walk,Single,Yes
+200023,35,,PhD,Research,Research Scientist,90000,630000,14,4,8,10,Public Transit,Married,No
+200024,30,Female,Diploma,Sales,Sales Representative,50000,350000,3,3,,15,Car,Single,Yes
+200025,39,Female,Bachelor's,IT,Software Engineer,,630000,15,4,10000,20,Public Transit,Married,No
+200026,29,Female,Master's,Finance,Financial Analyst,,455000,,3,-545,10,Car,Single,Yes
+200027,45,Male,Diploma,,Operations Manager,75000,525000,8,3,9,15,Car,Married,No
+200028,31,,,Marketing,Marketing Analyst,55000,385000,5,3,8,10,Talk,Single,No
+200029,17,Male,PhD,Research,Research Manager,110000,770000,18,5,7,30,Public Transit,Married,No
+200030,27,Female,Diploma,,Sales Representative,45000,315000,,2,9,5,Car,Single,No
+200031,32,Male,Diploma,Operations,Operations Manager,70000,490000,9,4,9,25,Car,Married,No
+200032,27,Female,Bachelor's,Marketing,Marketing Executive,45000,315000,2,2,10,5,Walk,Single,Yes
+200033,35,Male,PhD,Research,Research Scientist,90000,630000,14,4,7,10,Public Transit,Married,No
+200034,30,Female,Diploma,Sales,Sales Representative,50000,350000,3,3,9,15,Car,Single,Yes
+200035,39,Male,Bachelor's,IT,Software Engineer,90000,630000,15,4,8,20,Public Transit,Married,No
+200036,29,Female,Master's,Finance,Financial Analyst,65000,455000,6,3,9,10,Car,Single,Yes
+200037,34,Male,Diploma,Operations,Operations Manager,75000,525000,10,4,9,15,Car,Married,No
+200038,31,Female,Bachelor's,Marketing,Marketing Analyst,55000,385000,5,3,8,10,Walk,Single,Yes
+200039,,Male,Bachelor's,IT,Software Engineer,50000,,3,3,8,10,Car,Single,No
+200040,34,Female,Master's,Marketing,,75000,525000,10,4,9,,Public Transit,Married,No
+200041,42,Male,PhD,Research,Research Scientist,100000,700000,20,5,7,15,Walk,Married,No
+200042,29,Female,,Sales,Sales Representative,45000,315000,2,,10,5,Car,Single,Yes
+200043,36,Male,Bachelor's,IT,Software Engineer,80000,560000,12,4,8,30,,Married,No
+200044,28,Female,Master's,Finance,Financial Analyst,,420000,4,3,9,10,Car,Single,Yes
+200045,33,Male,,Sales,Sales Representative,55000,385000,7,3,9,10,Car,Married,No
+200046,31,Female,Bachelor's,Marketing,Marketing Analyst,60000,420000,5,3,9,5,Walk,Single,Yes
+200047,37,Male,PhD,Research,,120000,840000,15,4,7,20,Public Transit,Married,No
+200048,26,Female,Master's,IT,Software Engineer,55000,385000,3,3,8,15,Car,Single,No
+200049,32,Male,Diploma,Operations,Operations Manager,,490000,,3,9,25,Car,Married,No
+200050,27,Female,Bachelor's,Marketing,Marketing Executive,45000,315000,2,2,10,,Walk,Single,Yes
+200051,35,,PhD,Research,Research Scientist,90000,630000,14,4,8,10,Public Transit,Married,No
+200052,30,Female,Diploma,Sales,Sales Representative,50000,350000,3,3,,15,Car,Single,Yes
+200053,39,Male,Bachelor's,IT,Software Engineer,,630000,15,4,6,20,Public Transit,Married,No
+200054,29,Female,Master's,Finance,Financial Analyst,,455000,,3,9,10,Car,Single,Yes
+200055,34,Male,Diploma,,Operations Manager,75000,525000,8,3,9,15,Car,Married,No
+200056,31,,,Marketing,Marketing Analyst,55000,385000,5,3,8,10,Walk,Single,No
+200057,38,Male,PhD,Research,Research Manager,110000,770000,18,5,7,30,Public Transit,Married,No
+200058,27,Female,Diploma,,Sales Representative,45000,315000,,2,9,5,Car,Single,Yes
+200059,38,Male,PhD,Research,Research Manager,110000,770000,18,5,7,30,Public Transit,Married,No
+200060,27,Female,Diploma,Sales,Sales Representative,45000,315000,2,2,9,5,Car,Single,Yes
+200061,25,Male,Bachelor's,IT,Software Engineer,50000,350000,3,3,8,10,Car,Single,No
+200062,34,Female,Master's,Marketing,Marketing Manager,75000,525000,10,4,9,20,Public Transit,Married,No
+200063,42,Male,PhD,Research,Research Scientist,100000,700000,20,5,7,15,Walk,Married,No
+200064,29,Female,Diploma,Sales,Sales Representative,45000,315000,2,2,10,5,Car,Single,Yes
+200065,36,Male,Bachelor's,IT,Software Engineer,80000,560000,12,4,8,30,Public Transit,Married,No
+200066,28,Female,Master's,Finance,Financial Analyst,60000,420000,4,3,9,10,Car,Single,Yes
+200067,33,Male,Diploma,Sales,Sales Representative,55000,385000,7,3,9,10,Car,Married,No
+200068,31,Female,Bachelor's,Marketing,Marketing Analyst,60000,420000,5,3,9,5,Walk,Single,Yes
+200069,37,Male,PhD,Research,Research Manager,120000,840000,18,5,7,20,Public Transit,Married,No
+200070,26,Female,Master's,IT,Software Engineer,55000,385000,3,3,8,15,Car,Single,Yes
+200071,32,Male,Diploma,Operations,Operations Manager,70000,490000,9,4,9,25,Car,Married,No
+200072,27,Female,Bachelor's,Marketing,Marketing Executive,45000,315000,2,2,10,5,Walk,Single,Yes
+200073,35,Male,PhD,Research,Research Scientist,90000,630000,14,4,7,10,Public Transit,Married,No
+200074,30,Female,Diploma,Sales,Sales Representative,50000,350000,3,3,9,15,Car,Single,Yes
+200075,39,Male,Bachelor's,IT,Software Engineer,90000,630000,15,4,8,20,Public Transit,Married,No
+200076,29,Female,Master's,Finance,Financial Analyst,65000,455000,6,3,9,10,Car,Single,Yes
+200077,34,Male,Diploma,Operations,Operations Manager,75000,525000,10,4,9,15,Car,Married,No
+200078,31,Female,Bachelor's,Marketing,Marketing Analyst,55000,385000,5,3,8,10,Walk,Single,Yes
+200079,38,Male,PhD,Research,Research Manager,110000,770000,18,5,7,30,Public Transit,Married,No
+200080,27,Female,Diploma,Sales,Sales Representative,45000,315000,2,2,9,5,Car,Single,Yes
+200081,25,Male,Bachelor's,IT,Software Engineer,50000,350000,3,3,8,10,Car,Single,No
+200082,34,Female,Master's,Marketing,Marketing Manager,75000,525000,10,4,9,20,Public Transit,Married,No
+200083,42,Male,PhD,Research,Research Scientist,100000,700000,20,5,7,15,Walk,Married,No
+200084,29,Female,Diploma,Sales,Sales Representative,45000,315000,2,2,10,5,Car,Single,Yes
+200085,36,Male,Bachelor's,IT,Software Engineer,80000,560000,12,4,8,30,Public Transit,Married,No
+200086,28,Female,Master's,Finance,Financial Analyst,60000,420000,4,3,9,10,Car,Single,Yes
+200087,33,Male,Diploma,Sales,Sales Representative,55000,385000,7,3,9,10,Car,Married,No
+200088,31,Female,Bachelor's,Marketing,Marketing Analyst,60000,420000,5,3,9,5,Walk,Single,Yes
+200089,37,Male,PhD,Research,Research Manager,120000,840000,18,5,7,20,Public Transit,Married,No
+200090,26,Female,Master's,IT,Software Engineer,55000,385000,3,3,8,15,Car,Single,Yes
+200091,32,Male,Diploma,Operations,Operations Manager,70000,490000,9,4,9,25,Car,Married,No
+200092,27,Female,Bachelor's,Marketing,Marketing Executive,45000,315000,2,2,10,5,Walk,Single,Yes
+200093,35,Male,PhD,Research,Research Scientist,90000,630000,14,4,7,10,Public Transit,Married,No
+200094,30,Female,Diploma,Sales,Sales Representative,50000,350000,3,3,9,15,Car,Single,Yes
+200095,39,Male,Bachelor's,IT,Software Engineer,90000,630000,15,4,8,20,Public Transit,Married,No
+200096,29,Female,Master's,Finance,Financial Analyst,65000,455000,6,3,9,10,Car,Single,Yes
+200097,34,Male,Diploma,Operations,Operations Manager,75000,525000,10,4,9,15,Car,Married,No
+200098,31,Female,Bachelor's,Marketing,Marketing Analyst,55000,385000,5,3,8,10,Walk,Single,Yes
+200099,38,Male,PhD,Research,Research Manager,110000,770000,18,5,7,30,Public Transit,Married,No
+200100,27,Female,Diploma,Sales,Sales Representative,45000,315000,2,2,9,5,Car,Single,Yes
