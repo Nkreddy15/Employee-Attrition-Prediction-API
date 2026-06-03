@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Attrition Prediction</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 32px; color: #111827; }
+        .container { max-width: 1080px; margin: auto; background: #ffffff; padding: 34px; border-radius: 18px; box-shadow: 0 10px 32px rgba(0,0,0,0.08); }
+        h1 { margin: 0 0 8px; font-size: 32px; }
+        .subtitle { color: #4b5563; margin: 0; line-height: 1.5; }
+        .result { margin-top: 26px; padding: 22px; border-radius: 14px; font-weight: 700; }
+        .result.high { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .result.low { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .probability-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+        .prob-card { background: rgba(255,255,255,0.7); border-radius: 10px; padding: 12px; border: 1px solid rgba(0,0,0,0.08); }
+        .risk-box { margin-top: 16px; padding: 16px; border-radius: 12px; background: #f9fafb; border: 1px solid #e5e7eb; color: #111827; }
+        .risk-box h3 { margin: 0 0 10px; font-size: 17px; }
+        .risk-box ul { margin: 0; padding-left: 20px; line-height: 1.6; }
+        .error { margin-top: 26px; padding: 20px; border-radius: 12px; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-weight: 700; }
+        form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 28px; margin-top: 30px; }
+        .field { display: flex; flex-direction: column; }
+        label { font-weight: 700; margin-bottom: 8px; font-size: 15px; }
+        .range { color: #6b7280; font-weight: 500; font-size: 13px; }
+        input[type="number"], select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; background: #ffffff; }
+        input[type="range"] { width: 100%; margin-top: 10px; }
+        input:focus, select:focus { outline: none; border-color: #111827; box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12); }
+        .value-display { margin-top: 7px; font-size: 13px; color: #374151; font-weight: 600; }
+        .hint { margin-top: 6px; font-size: 12px; color: #6b7280; }
+        .client-error { margin-top: 7px; color: #b91c1c; font-size: 13px; display: none; font-weight: 700; }
+        button { grid-column: 1 / -1; padding: 16px; background: #111827; color: #ffffff; border: none; border-radius: 12px; font-size: 17px; font-weight: 800; cursor: pointer; margin-top: 8px; }
+        button:hover { background: #374151; }
+        .model-note { margin-top: 24px; padding: 16px; border-radius: 12px; background: #f9fafb; color: #374151; border: 1px solid #e5e7eb; font-size: 14px; line-height: 1.5; }
+        @media (max-width: 760px) { body { padding: 16px; } .container { padding: 22px; } form { grid-template-columns: 1fr; } .probability-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Employee Attrition Prediction</h1>
+    <p class="subtitle">Select employee details below. Numeric fields show accepted ranges, use sliders, and reject invalid values before prediction.</p>
+
+    {% if error %}
+    <div class="error">Error: {{ error }}</div>
+    {% endif %}
+
+    {% if prediction %}
+    <div class="result {% if prediction == 'Yes' %}high{% else %}low{% endif %}">
+        {% if prediction == "Yes" %}High Attrition Risk{% else %}Low Attrition Risk{% endif %}
+        <br>
+        Prediction: {{ prediction }}<br>
+        Model Confidence: {{ "%.2f"|format(confidence * 100) if confidence is not none else "N/A" }}%
+
+        <div class="probability-grid">
+            <div class="prob-card">
+                Probability of Staying / No Attrition:<br>
+                {{ "%.2f"|format(probability_no * 100) if probability_no is not none else "N/A" }}%
+            </div>
+            <div class="prob-card">
+                Probability of Leaving / Attrition:<br>
+                {{ "%.2f"|format(probability_yes * 100) if probability_yes is not none else "N/A" }}%
+            </div>
+        </div>
+
+        <div class="risk-box">
+            <h3>Top Rule-Based Risk Factors</h3>
+            <ul>
+                {% for factor in risk_factors %}
+                <li>{{ factor }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <form method="POST" id="predictionForm" novalidate>
+        {% for field in numeric_fields %}
+        <div class="field">
+            <label>{{ field }} <span class="range">({{ numeric_rules[field]["min"] }} - {{ numeric_rules[field]["max"] }})</span></label>
+            <input type="number" name="{{ field }}" id="num-{{ loop.index }}"
+                min="{{ numeric_rules[field]['min'] }}" max="{{ numeric_rules[field]['max'] }}"
+                step="{{ numeric_rules[field]['step'] }}"
+                value="{{ submitted_values.get(field, numeric_rules[field]['default']) }}"
+                data-min="{{ numeric_rules[field]['min'] }}" data-max="{{ numeric_rules[field]['max'] }}" required>
+            <input type="range" id="slider-{{ loop.index }}"
+                min="{{ numeric_rules[field]['min'] }}" max="{{ numeric_rules[field]['max'] }}"
+                step="{{ numeric_rules[field]['step'] }}"
+                value="{{ submitted_values.get(field, numeric_rules[field]['default']) }}">
+            <div class="value-display">Selected: <span id="display-{{ loop.index }}">{{ submitted_values.get(field, numeric_rules[field]['default']) }}</span></div>
+            <div class="hint">Valid range: {{ numeric_rules[field]["min"] }} to {{ numeric_rules[field]["max"] }}.</div>
+            <div class="client-error" id="error-{{ loop.index }}">{{ field }} must be between {{ numeric_rules[field]["min"] }} and {{ numeric_rules[field]["max"] }}.</div>
+        </div>
+        {% endfor %}
+
+        {% for field in categorical_fields %}
+        <div class="field">
+            <label>{{ field }}</label>
+            <select name="{{ field }}" required>
+                {% for option in dropdown_options[field] %}
+                <option value="{{ option }}" {% if submitted_values.get(field) == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+            </select>
+            <div class="hint">Select one of the accepted model categories.</div>
+        </div>
+        {% endfor %}
+
+        <button type="submit">Predict Attrition</button>
+    </form>
+
+    <div class="model-note">
+        <strong>Model:</strong> Gradient Boosting Classifier |
+        <strong>Interface:</strong> Flask Web App + REST API |
+        <strong>Note:</strong> This is a machine learning demonstration. Predictions depend on training data quality and should be interpreted as model output, not final HR judgment.
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("predictionForm");
+    const numberInputs = form.querySelectorAll("input[type='number']");
+
+    numberInputs.forEach(function(input, index) {
+        const slider = document.getElementById("slider-" + (index + 1));
+        const display = document.getElementById("display-" + (index + 1));
+
+        input.addEventListener("input", function() {
+            slider.value = input.value;
+            display.textContent = input.value;
+        });
+
+        slider.addEventListener("input", function() {
+            input.value = slider.value;
+            display.textContent = slider.value;
+        });
+    });
+
+    form.addEventListener("submit", function(event) {
+        let valid = true;
+
+        numberInputs.forEach(function(input, index) {
+            const min = parseFloat(input.dataset.min);
+            const max = parseFloat(input.dataset.max);
+            const value = parseFloat(input.value);
+            const errorBox = document.getElementById("error-" + (index + 1));
+
+            if (isNaN(value) || value < min || value > max) {
+                errorBox.style.display = "block";
+                input.style.borderColor = "#b91c1c";
+                valid = false;
+            } else {
+                errorBox.style.display = "none";
+                input.style.borderColor = "#d1d5db";
+            }
+        });
+
+        if (!valid) {
+            event.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    });
+</script>
+</body>
+</html>
