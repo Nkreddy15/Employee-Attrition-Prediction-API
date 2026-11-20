@@ -32,7 +32,7 @@ jobs:
           docker build -t employee-attrition-api .
           docker run -d --name attrition -p 7860:7860 employee-attrition-api
           trap 'docker logs attrition; docker rm -f attrition' EXIT
-          curl --retry 20 --retry-connrefused --retry-delay 2 --fail http://localhost:7860/health
+          curl --retry 20 --retry-all-errors --retry-delay 2 --max-time 5 --fail http://localhost:7860/health
           curl --fail http://localhost:7860/form > /dev/null
           curl --fail -H 'Content-Type: application/json' --data-binary @examples/request.json http://localhost:7860/predict
           curl --fail http://localhost:7860/metrics
