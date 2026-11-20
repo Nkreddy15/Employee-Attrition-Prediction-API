@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Employee Attrition Prediction</title>
     <style>
         * { box-sizing: border-box; }
@@ -37,7 +38,7 @@
 <body>
 <div class="container">
     <h1>Employee Attrition Prediction</h1>
-    <p class="subtitle">Select employee details below. Numeric fields show accepted ranges, use sliders, and reject invalid values before prediction.</p>
+    <p class="subtitle">Explore a small employee attrition demo. Scores are uncalibrated model outputs, unsuitable for real employment decisions.</p>
 
     {% if error %}
     <div class="error">Error: {{ error }}</div>
@@ -45,37 +46,39 @@
 
     {% if prediction %}
     <div class="result {% if prediction == 'Yes' %}high{% else %}low{% endif %}">
-        {% if prediction == "Yes" %}High Attrition Risk{% else %}Low Attrition Risk{% endif %}
+        {% if prediction == "Yes" %}Model output: Yes{% else %}Model output: No{% endif %}
         <br>
         Prediction: {{ prediction }}<br>
-        Model Confidence: {{ "%.2f"|format(confidence * 100) if confidence is not none else "N/A" }}%
+        Model score (uncalibrated): {{ "%.2f"|format(confidence * 100) if confidence is not none else "N/A" }}%
 
         <div class="probability-grid">
             <div class="prob-card">
-                Probability of Staying / No Attrition:<br>
+                No attrition — model score:<br>
                 {{ "%.2f"|format(probability_no * 100) if probability_no is not none else "N/A" }}%
             </div>
             <div class="prob-card">
-                Probability of Leaving / Attrition:<br>
+                Attrition — model score:<br>
                 {{ "%.2f"|format(probability_yes * 100) if probability_yes is not none else "N/A" }}%
             </div>
         </div>
 
+        {% if warnings %}
         <div class="risk-box">
-            <h3>Top Rule-Based Risk Factors</h3>
+            <h3>Input notes</h3>
             <ul>
-                {% for factor in risk_factors %}
-                <li>{{ factor }}</li>
+                {% for warning in warnings %}
+                <li>{{ warning }}</li>
                 {% endfor %}
             </ul>
         </div>
+        {% endif %}
     </div>
     {% endif %}
 
     <form method="POST" id="predictionForm" novalidate>
         {% for field in numeric_fields %}
         <div class="field">
-            <label>{{ field }} <span class="range">({{ numeric_rules[field]["min"] }} - {{ numeric_rules[field]["max"] }})</span></label>
+            <label for="num-{{ loop.index }}">{{ field }} <span class="range">({{ numeric_rules[field]["min"] }} - {{ numeric_rules[field]["max"] }})</span></label>
             <input type="number" name="{{ field }}" id="num-{{ loop.index }}"
                 min="{{ numeric_rules[field]['min'] }}" max="{{ numeric_rules[field]['max'] }}"
                 step="{{ numeric_rules[field]['step'] }}"
@@ -86,15 +89,15 @@
                 step="{{ numeric_rules[field]['step'] }}"
                 value="{{ submitted_values.get(field, numeric_rules[field]['default']) }}">
             <div class="value-display">Selected: <span id="display-{{ loop.index }}">{{ submitted_values.get(field, numeric_rules[field]['default']) }}</span></div>
-            <div class="hint">Valid range: {{ numeric_rules[field]["min"] }} to {{ numeric_rules[field]["max"] }}.</div>
+            <div class="hint">Unit: {{ numeric_rules[field]["unit"] }}. Valid range: {{ numeric_rules[field]["min"] }} to {{ numeric_rules[field]["max"] }}.</div>
             <div class="client-error" id="error-{{ loop.index }}">{{ field }} must be between {{ numeric_rules[field]["min"] }} and {{ numeric_rules[field]["max"] }}.</div>
         </div>
         {% endfor %}
 
         {% for field in categorical_fields %}
         <div class="field">
-            <label>{{ field }}</label>
-            <select name="{{ field }}" required>
+            <label for="category-{{ loop.index }}">{{ field }}</label>
+            <select name="{{ field }}" id="category-{{ loop.index }}" required>
                 {% for option in dropdown_options[field] %}
                 <option value="{{ option }}" {% if submitted_values.get(field) == option %}selected{% endif %}>{{ option }}</option>
                 {% endfor %}
@@ -109,7 +112,7 @@
     <div class="model-note">
         <strong>Model:</strong> Gradient Boosting Classifier |
         <strong>Interface:</strong> Flask Web App + REST API |
-        <strong>Note:</strong> This is a machine learning demonstration. Predictions depend on training data quality and should be interpreted as model output, not final HR judgment.
+        <strong>Data:</strong> 100 source rows with repeated profiles and unverified provenance. Income and working hours are excluded pending unit verification; gender and marital status are excluded from predictions. Salary period and distance units are unspecified in the source.
     </div>
 </div>
 

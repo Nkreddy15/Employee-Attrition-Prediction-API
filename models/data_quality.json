@@ -1,0 +1,42 @@
+{
+  "n_rows": 100,
+  "raw_rows_with_missing_values": 32,
+  "invalid_values_set_missing": {
+    "Age": 1,
+    "Salary (USD)": 0,
+    "Years of Experience": 0,
+    "Performance Rating": 1,
+    "Distance from Home": 0,
+    "experience_exceeds_adult_age": 1,
+    "Education Level": 0,
+    "Department": 0,
+    "Job Role": 0,
+    "Commute Method": 1
+  },
+  "missing_after_checks": {
+    "Age": 3,
+    "Salary (USD)": 8,
+    "Years of Experience": 7,
+    "Performance Rating": 3,
+    "Distance from Home": 4,
+    "Education Level": 6,
+    "Department": 5,
+    "Job Role": 4,
+    "Commute Method": 3
+  },
+  "excluded_fields": {
+    "Income (Euro)": "Excluded: currency units are unverified and values largely duplicate Salary (USD) at 7x.",
+    "Working Hours": "Excluded: the source does not verify daily versus weekly units and contains invalid outliers.",
+    "Gender": "Excluded from model inputs.",
+    "Marital Status": "Excluded from model inputs."
+  },
+  "raw_csv_sha256": "34e80cf344633b83ae08e0ecb1bcd48a62820e906d17571bcb8f8ac5f9098919",
+  "assumptions": [
+    "Age >= 18; experience cannot exceed age minus 18 for this demo.",
+    "Salary period and distance units are unspecified by the source.",
+    "No income conversion or daily-to-weekly hours conversion is inferred."
+  ],
+  "n_unique_profile_groups": 41,
+  "duplicate_profile_rows": 59,
+  "conflicting_label_profile_groups": 3
+}

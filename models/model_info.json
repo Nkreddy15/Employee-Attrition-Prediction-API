@@ -1,0 +1,332 @@
+{
+  "model_version": "v2-cfa5777fd5ec",
+  "schema_version": "2",
+  "trained_at": "2026-11-20T21:59:36+00:00",
+  "python_version": "3.12.14",
+  "sklearn_version": "1.8.0",
+  "n_training_rows": 100,
+  "n_features": 9,
+  "features": [
+    "Age",
+    "Salary (USD)",
+    "Years of Experience",
+    "Performance Rating",
+    "Distance from Home",
+    "Education Level",
+    "Department",
+    "Job Role",
+    "Commute Method"
+  ],
+  "evaluation": "5-fold StratifiedGroupKFold; identical cleaned observed profiles remain in one fold; fold-local imputation, encoding and scaling",
+  "cross_validated_metrics": {
+    "accuracy": {
+      "mean": 0.8271177944862156,
+      "std": 0.08673133579343609,
+      "fold_scores": [
+        0.7368421052631579,
+        0.9,
+        0.9523809523809523,
+        0.7368421052631579,
+        0.8095238095238095
+      ]
+    },
+    "precision": {
+      "mean": 0.8425213675213674,
+      "std": 0.1262377538110233,
+      "fold_scores": [
+        0.6153846153846154,
+        0.875,
+        0.8888888888888888,
+        1.0,
+        0.8333333333333334
+      ]
+    },
+    "recall": {
+      "mean": 0.775,
+      "std": 0.24238399287081647,
+      "fold_scores": [
+        1.0,
+        0.875,
+        1.0,
+        0.375,
+        0.625
+      ]
+    },
+    "f1": {
+      "mean": 0.7675642984466514,
+      "std": 0.13703065098163733,
+      "fold_scores": [
+        0.7619047619047619,
+        0.875,
+        0.9411764705882353,
+        0.5454545454545454,
+        0.7142857142857143
+      ]
+    },
+    "roc_auc": {
+      "mean": 0.9343531468531469,
+      "std": 0.035673975455755416,
+      "fold_scores": [
+        0.8977272727272727,
+        0.9375,
+        0.9278846153846154,
+        1.0,
+        0.9086538461538461
+      ]
+    }
+  },
+  "model_comparison": {
+    "gradient_boosting": {
+      "accuracy": {
+        "mean": 0.8271177944862156,
+        "std": 0.08673133579343609,
+        "fold_scores": [
+          0.7368421052631579,
+          0.9,
+          0.9523809523809523,
+          0.7368421052631579,
+          0.8095238095238095
+        ]
+      },
+      "precision": {
+        "mean": 0.8425213675213674,
+        "std": 0.1262377538110233,
+        "fold_scores": [
+          0.6153846153846154,
+          0.875,
+          0.8888888888888888,
+          1.0,
+          0.8333333333333334
+        ]
+      },
+      "recall": {
+        "mean": 0.775,
+        "std": 0.24238399287081647,
+        "fold_scores": [
+          1.0,
+          0.875,
+          1.0,
+          0.375,
+          0.625
+        ]
+      },
+      "f1": {
+        "mean": 0.7675642984466514,
+        "std": 0.13703065098163733,
+        "fold_scores": [
+          0.7619047619047619,
+          0.875,
+          0.9411764705882353,
+          0.5454545454545454,
+          0.7142857142857143
+        ]
+      },
+      "roc_auc": {
+        "mean": 0.9343531468531469,
+        "std": 0.035673975455755416,
+        "fold_scores": [
+          0.8977272727272727,
+          0.9375,
+          0.9278846153846154,
+          1.0,
+          0.9086538461538461
+        ]
+      }
+    },
+    "logistic_regression": {
+      "accuracy": {
+        "mean": 0.8972681704260651,
+        "std": 0.08318462998240655,
+        "fold_scores": [
+          0.8947368421052632,
+          0.95,
+          0.9523809523809523,
+          0.7368421052631579,
+          0.9523809523809523
+        ]
+      },
+      "precision": {
+        "mean": 0.9155555555555555,
+        "std": 0.07620634755325442,
+        "fold_scores": [
+          0.8,
+          1.0,
+          0.8888888888888888,
+          1.0,
+          0.8888888888888888
+        ]
+      },
+      "recall": {
+        "mean": 0.85,
+        "std": 0.24238399287081647,
+        "fold_scores": [
+          1.0,
+          0.875,
+          1.0,
+          0.375,
+          1.0
+        ]
+      },
+      "f1": {
+        "mean": 0.8500059417706476,
+        "std": 0.153512879856438,
+        "fold_scores": [
+          0.8888888888888888,
+          0.9333333333333333,
+          0.9411764705882353,
+          0.5454545454545454,
+          0.9411764705882353
+        ]
+      },
+      "roc_auc": {
+        "mean": 0.9301282051282052,
+        "std": 0.03906228927872266,
+        "fold_scores": [
+          0.9261363636363635,
+          0.8958333333333334,
+          0.9471153846153846,
+          0.8863636363636364,
+          0.9951923076923077
+        ]
+      }
+    },
+    "majority_baseline": {
+      "accuracy": {
+        "mean": 0.5991979949874687,
+        "std": 0.017937860047194016,
+        "fold_scores": [
+          0.5789473684210527,
+          0.6,
+          0.6190476190476191,
+          0.5789473684210527,
+          0.6190476190476191
+        ]
+      },
+      "precision": {
+        "mean": 0.0,
+        "std": 0.0,
+        "fold_scores": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "recall": {
+        "mean": 0.0,
+        "std": 0.0,
+        "fold_scores": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "f1": {
+        "mean": 0.0,
+        "std": 0.0,
+        "fold_scores": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "roc_auc": {
+        "mean": 0.5,
+        "std": 0.0,
+        "fold_scores": [
+          0.5,
+          0.5,
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    }
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "training_rows": 81,
+      "validation_rows": 19,
+      "overlapping_profile_groups": 0
+    },
+    {
+      "fold": 2,
+      "training_rows": 80,
+      "validation_rows": 20,
+      "overlapping_profile_groups": 0
+    },
+    {
+      "fold": 3,
+      "training_rows": 79,
+      "validation_rows": 21,
+      "overlapping_profile_groups": 0
+    },
+    {
+      "fold": 4,
+      "training_rows": 81,
+      "validation_rows": 19,
+      "overlapping_profile_groups": 0
+    },
+    {
+      "fold": 5,
+      "training_rows": 79,
+      "validation_rows": 21,
+      "overlapping_profile_groups": 0
+    }
+  ],
+  "data_quality": {
+    "n_rows": 100,
+    "raw_rows_with_missing_values": 32,
+    "invalid_values_set_missing": {
+      "Age": 1,
+      "Salary (USD)": 0,
+      "Years of Experience": 0,
+      "Performance Rating": 1,
+      "Distance from Home": 0,
+      "experience_exceeds_adult_age": 1,
+      "Education Level": 0,
+      "Department": 0,
+      "Job Role": 0,
+      "Commute Method": 1
+    },
+    "missing_after_checks": {
+      "Age": 3,
+      "Salary (USD)": 8,
+      "Years of Experience": 7,
+      "Performance Rating": 3,
+      "Distance from Home": 4,
+      "Education Level": 6,
+      "Department": 5,
+      "Job Role": 4,
+      "Commute Method": 3
+    },
+    "excluded_fields": {
+      "Income (Euro)": "Excluded: currency units are unverified and values largely duplicate Salary (USD) at 7x.",
+      "Working Hours": "Excluded: the source does not verify daily versus weekly units and contains invalid outliers.",
+      "Gender": "Excluded from model inputs.",
+      "Marital Status": "Excluded from model inputs."
+    },
+    "raw_csv_sha256": "34e80cf344633b83ae08e0ecb1bcd48a62820e906d17571bcb8f8ac5f9098919",
+    "assumptions": [
+      "Age >= 18; experience cannot exceed age minus 18 for this demo.",
+      "Salary period and distance units are unspecified by the source.",
+      "No income conversion or daily-to-weekly hours conversion is inferred."
+    ],
+    "n_unique_profile_groups": 41,
+    "duplicate_profile_rows": 59,
+    "conflicting_label_profile_groups": 3
+  },
+  "probabilities_calibrated": false,
+  "limitations": [
+    "100 rows with repeated and conflicting profiles; provenance unverified.",
+    "Exact-profile grouping does not remove all similarity between near-duplicate profiles.",
+    "No independent external test set or validated subgroup fairness study.",
+    "Probabilities are uncalibrated model scores, not validated individual risk estimates."
+  ]
+}

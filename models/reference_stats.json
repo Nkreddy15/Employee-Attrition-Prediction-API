@@ -1,0 +1,135 @@
+{
+  "n_rows": 100,
+  "model_version": "v2-cfa5777fd5ec",
+  "schema_version": "2",
+  "numeric": {
+    "Age": {
+      "typical_min": 19.0,
+      "typical_max": 79.0,
+      "mean": 32.7,
+      "std": 6.650563885867122,
+      "bin_edges": [
+        28.0,
+        31.0,
+        33.4,
+        36.2
+      ],
+      "bin_probabilities": [
+        0.19,
+        0.19,
+        0.22,
+        0.2,
+        0.2
+      ],
+      "imputation_value": 32.0
+    },
+    "Salary (USD)": {
+      "typical_min": 45000.0,
+      "typical_max": 120000.0,
+      "mean": 68850.0,
+      "std": 21735.397396873148,
+      "bin_edges": [
+        50000.0,
+        58000.00000000001,
+        70000.0,
+        90000.0
+      ],
+      "bin_probabilities": [
+        0.15,
+        0.25,
+        0.19,
+        0.18,
+        0.23
+      ],
+      "imputation_value": 60000.0
+    },
+    "Years of Experience": {
+      "typical_min": 2.0,
+      "typical_max": 20.0,
+      "mean": 8.3,
+      "std": 5.600892785976178,
+      "bin_edges": [
+        3.0,
+        5.0,
+        8.399999999999999,
+        14.0
+      ],
+      "bin_probabilities": [
+        0.13,
+        0.2,
+        0.27,
+        0.16,
+        0.24
+      ],
+      "imputation_value": 7.0
+    },
+    "Performance Rating": {
+      "typical_min": 2.0,
+      "typical_max": 5.0,
+      "mean": 3.42,
+      "std": 0.862322445492404,
+      "bin_edges": [
+        3.0,
+        4.0
+      ],
+      "bin_probabilities": [
+        0.12,
+        0.47,
+        0.41
+      ],
+      "imputation_value": 3.0
+    },
+    "Distance from Home": {
+      "typical_min": 5.0,
+      "typical_max": 30.0,
+      "mean": 14.25,
+      "std": 7.479137650825796,
+      "bin_edges": [
+        10.0,
+        15.0,
+        20.0
+      ],
+      "bin_probabilities": [
+        0.18,
+        0.34,
+        0.2,
+        0.28
+      ],
+      "imputation_value": 12.5
+    }
+  },
+  "categorical": {
+    "Education Level": {
+      "Bachelor's": 0.34,
+      "Diploma": 0.26,
+      "Master's": 0.2,
+      "PhD": 0.2
+    },
+    "Department": {
+      "IT": 0.25,
+      "Marketing": 0.2,
+      "Research": 0.2,
+      "Sales": 0.18,
+      "Finance": 0.1,
+      "Operations": 0.07
+    },
+    "Job Role": {
+      "Sales Representative": 0.24,
+      "Software Engineer": 0.2,
+      "Research Scientist": 0.1,
+      "Financial Analyst": 0.1,
+      "Marketing Analyst": 0.1,
+      "Operations Manager": 0.1,
+      "Research Manager": 0.08,
+      "Marketing Executive": 0.05,
+      "Marketing Manager": 0.03
+    },
+    "Commute Method": {
+      "Car": 0.53,
+      "Public Transit": 0.28,
+      "Walk": 0.19
+    }
+  },
+  "positive_rate": 0.4,
+  "reference_prediction_rate": 0.42
+}

@@ -1,213 +1,160 @@
-from flask import Flask, request, jsonify, render_template
-import joblib
-import pandas as pd
+from __future__ import annotations
+
+import json
+import logging
+import re
+import time
 from pathlib import Path
 
+import joblib
+import pandas as pd
+import sklearn
+from flask import Flask, Response, g, jsonify, render_template, request
+from werkzeug.exceptions import HTTPException
+
+from monitoring import PredictionLogger, RequestMetrics, new_request_id
+from schema import CATEGORY_OPTIONS, CATEGORICAL_FIELDS, EXCLUDED_FIELDS, FEATURE_COLUMNS, NUMERIC_FIELDS, NUMERIC_RULES, SCHEMA_VERSION, validate_input
+
 BASE_DIR = Path(__file__).resolve().parent
+model = joblib.load(BASE_DIR / "models/employee_attrition_model.pkl")
+model_info = json.loads((BASE_DIR / "models/model_info.json").read_text())
+reference_stats = json.loads((BASE_DIR / "models/reference_stats.json").read_text())
+if (model_info["schema_version"] != SCHEMA_VERSION
+        or reference_stats["schema_version"] != SCHEMA_VERSION
+        or reference_stats["model_version"] != model_info["model_version"]
+        or model_info["sklearn_version"] != sklearn.__version__
+        or list(model.feature_names_in_) != FEATURE_COLUMNS):
+    raise RuntimeError("Model, schema and drift reference must be regenerated together.")
 
-MODEL_PATH = BASE_DIR / "models" / "employee_attrition_model.pkl"
-SCALER_PATH = BASE_DIR / "models" / "scaler.pkl"
-ENCODERS_PATH = BASE_DIR / "models" / "label_encoders.pkl"
-FEATURE_COLUMNS_PATH = BASE_DIR / "models" / "feature_columns.pkl"
+app = Flask(__name__, template_folder="template")
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger("attrition_api")
+metrics = RequestMetrics()
+prediction_logger = PredictionLogger()
 
-model = joblib.load(MODEL_PATH)
-scaler = joblib.load(SCALER_PATH)
-label_encoders = joblib.load(ENCODERS_PATH)
-feature_columns = joblib.load(FEATURE_COLUMNS_PATH)
 
-app = Flask(__name__)
+@app.before_request
+def start_timer():
+    g.start = time.perf_counter()
+    candidate = request.headers.get("X-Request-ID", "")
+    g.request_id = candidate if re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", candidate) else new_request_id()
 
-NUMERIC_RULES = {
-    "Age": {"min": 18, "max": 65, "step": 1, "default": 32},
-    "Salary (USD)": {"min": 20000, "max": 250000, "step": 1000, "default": 65000},
-    "Income (Euro)": {"min": 18000, "max": 230000, "step": 1000, "default": 60000},
-    "Years of Experience": {"min": 0, "max": 45, "step": 1, "default": 7},
-    "Performance Rating": {"min": 1, "max": 5, "step": 1, "default": 4},
-    "Working Hours": {"min": 20, "max": 80, "step": 1, "default": 42},
-    "Distance from Home": {"min": 0, "max": 100, "step": 1, "default": 10}
-}
 
-NUMERIC_FIELDS = list(NUMERIC_RULES.keys())
-CATEGORICAL_FIELDS = [col for col in feature_columns if col in label_encoders]
+@app.after_request
+def record_request(response):
+    latency_ms = (time.perf_counter() - g.start) * 1000
+    path = request.url_rule.rule if request.url_rule else "unmatched"
+    metrics.record_request(request.method, path, response.status_code, latency_ms)
+    response.headers["X-Request-ID"] = g.request_id
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    logger.info(json.dumps({"event": "request", "request_id": g.request_id, "method": request.method,
+                            "path": path, "status": response.status_code, "latency_ms": round(latency_ms, 2)}))
+    return response
+
+
+@app.errorhandler(HTTPException)
+def handle_http_error(error):
+    if error.code in {400, 413, 415}:
+        metrics.record_validation_error()
+    return jsonify({"error": error.description}), error.code
 
 
 @app.route("/")
 def home():
-    return jsonify({
-        "message": "Employee Attrition Prediction API is running.",
-        "web_form": "/form",
-        "api_usage": "Send POST request to /predict with employee details as JSON."
-    })
+    return jsonify({"message": "Employee Attrition API: portfolio demo", "web_form": "/form",
+                    "health": "/health", "metrics": "/metrics", "schema": "/schema", "model_version": model_info["model_version"]})
 
 
-@app.route("/form", methods=["GET", "POST"])
-def form():
-    prediction = None
-    confidence = None
-    probability_yes = None
-    probability_no = None
-    error = None
-    risk_factors = []
-    submitted_values = {}
+@app.route("/schema")
+def schema():
+    return jsonify({"schema_version": SCHEMA_VERSION, "required_fields": FEATURE_COLUMNS,
+                    "numeric": NUMERIC_RULES, "categorical": CATEGORY_OPTIONS, "excluded_legacy_fields": EXCLUDED_FIELDS})
 
-    dropdown_options = {
-        col: list(label_encoders[col].classes_)
-        for col in CATEGORICAL_FIELDS
+
+def make_prediction(data):
+    clean, warnings = validate_input(data)
+    warnings.extend(out_of_training_range_warnings(clean))
+    values = model.predict_proba(pd.DataFrame([clean], columns=FEATURE_COLUMNS))[0]
+    probabilities = dict(zip(model.classes_, values))
+    yes, no = float(probabilities[1]), float(probabilities[0])
+    result = {
+        "attrition_prediction": "Yes" if yes > no else "No",
+        "confidence": max(yes, no), "probability_yes": yes, "probability_no": no,
+        "probabilities_calibrated": False, "risk_factors": [],
+        "warnings": warnings, "model_version": model_info["model_version"], "schema_version": SCHEMA_VERSION,
+        "usage_note": "Portfolio demo. Scores are uncalibrated and unsuitable for real employment decisions.",
     }
+    return clean, result
 
-    if request.method == "POST":
-        try:
-            input_data = parse_form_input(request.form)
-            submitted_values = input_data.copy()
-            result = make_prediction(input_data)
 
-            prediction = result["attrition_prediction"]
-            confidence = result["confidence"]
-            probability_yes = result["probability_yes"]
-            probability_no = result["probability_no"]
-            risk_factors = result["risk_factors"]
+def out_of_training_range_warnings(data):
+    warnings = []
+    for name, reference in reference_stats["numeric"].items():
+        low, high = reference["typical_min"], reference["typical_max"]
+        if not low <= data[name] <= high:
+            warnings.append(f"{name}={data[name]:g} is outside the observed training range [{low:g}, {high:g}].")
+    return warnings
 
-        except Exception as e:
-            error = str(e)
-            submitted_values = request.form.to_dict()
 
-    return render_template(
-        "index.html",
-        numeric_rules=NUMERIC_RULES,
-        numeric_fields=NUMERIC_FIELDS,
-        categorical_fields=CATEGORICAL_FIELDS,
-        dropdown_options=dropdown_options,
-        prediction=prediction,
-        confidence=confidence,
-        probability_yes=probability_yes,
-        probability_no=probability_no,
-        risk_factors=risk_factors,
-        error=error,
-        submitted_values=submitted_values
-    )
+def record_prediction(source, inputs, result):
+    metrics.record_prediction(result["attrition_prediction"])
+    metrics.record_out_of_range(sum("outside the observed training range" in message for message in result["warnings"]))
+    try:
+        prediction_logger.log(g.request_id, source, inputs, result, (time.perf_counter() - g.start) * 1000)
+    except OSError:
+        metrics.record_log_error()
+        logger.error(json.dumps({"event": "prediction_log_failed", "request_id": g.request_id}))
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    data = request.get_json(silent=True)
     try:
-        data = request.get_json()
-        result = make_prediction(data)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        clean, result = make_prediction(data)
+    except ValueError as error:
+        metrics.record_validation_error()
+        return jsonify({"error": f"Invalid input: {error}"}), 400
+    except Exception:
+        logger.exception(json.dumps({"event": "prediction_failed", "request_id": g.request_id}))
+        return jsonify({"error": "Unexpected server error."}), 500
+    record_prediction("api", clean, result)
+    return jsonify(result)
 
 
-def parse_form_input(form_data):
-    input_data = {}
-
-    for field, rules in NUMERIC_RULES.items():
-        raw_value = form_data.get(field)
-
-        if raw_value is None or raw_value == "":
-            raise ValueError(f"{field} is required.")
-
+@app.route("/form", methods=["GET", "POST"])
+def form():
+    result, error, status = {}, None, 200
+    submitted = request.form.to_dict() if request.method == "POST" else {}
+    if request.method == "POST":
         try:
-            value = float(raw_value)
-        except ValueError:
-            raise ValueError(f"{field} must be a number.")
-
-        if value < rules["min"] or value > rules["max"]:
-            raise ValueError(f"{field} must be between {rules['min']} and {rules['max']}.")
-
-        input_data[field] = value
-
-    for field in CATEGORICAL_FIELDS:
-        value = form_data.get(field)
-        if not value:
-            raise ValueError(f"{field} is required.")
-        input_data[field] = value
-
-    return input_data
+            clean, result = make_prediction(submitted)
+            record_prediction("form", clean, result)
+        except ValueError as failure:
+            metrics.record_validation_error()
+            error, status = str(failure), 400
+        except Exception:
+            logger.exception(json.dumps({"event": "form_prediction_failed", "request_id": g.request_id}))
+            error, status = "Unexpected server error.", 500
+    return render_template("index.html", numeric_rules=NUMERIC_RULES, numeric_fields=NUMERIC_FIELDS,
+                           categorical_fields=CATEGORICAL_FIELDS, dropdown_options=CATEGORY_OPTIONS,
+                           prediction=result.get("attrition_prediction"), confidence=result.get("confidence"),
+                           probability_yes=result.get("probability_yes"), probability_no=result.get("probability_no"),
+                           warnings=result.get("warnings", []), error=error, submitted_values=submitted), status
 
 
-def make_prediction(data):
-    df = pd.DataFrame([data])
-
-    missing_cols = [col for col in feature_columns if col not in df.columns]
-    if missing_cols:
-        raise ValueError(f"Missing required fields: {missing_cols}")
-
-    df = df[feature_columns].copy()
-
-    for field, rules in NUMERIC_RULES.items():
-        value = float(df.loc[0, field])
-        if value < rules["min"] or value > rules["max"]:
-            raise ValueError(f"{field} must be between {rules['min']} and {rules['max']}.")
-        df.loc[0, field] = value
-
-    risk_factors = calculate_risk_factors(data)
-
-    for col in CATEGORICAL_FIELDS:
-        value = df.loc[0, col]
-        accepted_values = list(label_encoders[col].classes_)
-
-        if value not in accepted_values:
-            raise ValueError(
-                f"Unknown category '{value}' for column '{col}'. Accepted values: {accepted_values}"
-            )
-
-        df[col] = label_encoders[col].transform(df[col])
-
-    df_scaled = scaler.transform(df)
-    prediction = int(model.predict(df_scaled)[0])
-
-    confidence = None
-    probability_no = None
-    probability_yes = None
-
-    if hasattr(model, "predict_proba"):
-        probabilities = model.predict_proba(df_scaled)[0]
-        probability_no = float(probabilities[0])
-        probability_yes = float(probabilities[1])
-        confidence = float(max(probabilities))
-
-    return {
-        "attrition_prediction": "Yes" if prediction == 1 else "No",
-        "confidence": confidence,
-        "probability_no": probability_no,
-        "probability_yes": probability_yes,
-        "risk_factors": risk_factors
-    }
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok", "model_loaded": model is not None, "model_version": model_info["model_version"],
+                    "schema_version": SCHEMA_VERSION, "n_features": len(FEATURE_COLUMNS),
+                    "model_trained_at": model_info["trained_at"], "sklearn_version_at_training": model_info["sklearn_version"]})
 
 
-def calculate_risk_factors(data):
-    factors = []
-
-    age = float(data.get("Age", 0))
-    salary = float(data.get("Salary (USD)", 0))
-    income = float(data.get("Income (Euro)", 0))
-    experience = float(data.get("Years of Experience", 0))
-    performance = float(data.get("Performance Rating", 0))
-    working_hours = float(data.get("Working Hours", 0))
-    distance = float(data.get("Distance from Home", 0))
-    marital_status = str(data.get("Marital Status", ""))
-
-    if salary <= 40000:
-        factors.append("Low salary may increase attrition risk.")
-    if income <= 35000:
-        factors.append("Low income level may contribute to dissatisfaction.")
-    if working_hours >= 60:
-        factors.append("High working hours may indicate burnout risk.")
-    if distance >= 50:
-        factors.append("Long commute distance may increase leaving risk.")
-    if performance <= 2:
-        factors.append("Low performance rating may indicate role mismatch or disengagement.")
-    if experience <= 1:
-        factors.append("Low experience may indicate early-career mobility.")
-    if age <= 25:
-        factors.append("Younger employees may be more likely to switch roles.")
-    if marital_status.lower() == "single":
-        factors.append("Single employees may have higher flexibility to relocate or change jobs.")
-
-    if not factors:
-        factors.append("No obvious rule-based risk factors detected from the entered profile.")
-
-    return factors[:5]
+@app.route("/metrics")
+def metrics_endpoint():
+    if request.args.get("format") == "json":
+        return jsonify(metrics.snapshot())
+    return Response(metrics.render_prometheus(), content_type="text/plain; version=0.0.4; charset=utf-8")
 
 
 if __name__ == "__main__":
